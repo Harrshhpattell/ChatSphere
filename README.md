@@ -10,4 +10,4 @@ A real-time chat application built using the MERN stack (MongoDB, Express.js, Re
 - Real-time messaging with WebSocket (Socket.IO)
 - Responsive design for both desktop and mobile
 - Online/offline user status indicators
-- Group and one-on-one chats (optional)
+- one-on-one chats
