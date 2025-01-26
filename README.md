@@ -12,6 +12,8 @@ A real-time chat application built using the MERN stack (MongoDB, Express.js, Re
 - Online/offline user status indicators
 - one-on-one chats
 
+---
+
 ![image](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 ![image](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![image](https://img.shields.io/badge/Socket.io-010101?&style=for-the-badge&logo=Socket.io&logoColor=white)
