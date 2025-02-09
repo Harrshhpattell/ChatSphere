@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Loader } from "lucide-react";
 import ProtectedLayout from "./layout/ProtectedLayout";
+import Chat from "./pages/Chat";
 
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -16,14 +17,13 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  console.log({ authUser });
-
   if (isCheckingAuth && !authUser)
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader className="size-10 animate-spin" />
       </div>
     );
+    
   return (
     <>
       <BrowserRouter>
@@ -37,7 +37,7 @@ function App() {
 
           {/* Protected Routes (For authenticated users) */}
           <Route element={<ProtectedLayout />}>
-            <Route path="/chat" element={<Home />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/dashboard" element={<Home />} />
           </Route>
         </Routes>

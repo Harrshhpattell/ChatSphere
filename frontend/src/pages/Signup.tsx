@@ -19,6 +19,11 @@ import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
+
+interface ErrorResponse {
+  message?: string;
+}
 
 // Define Zod Schema
 const signupSchema = z.object({
@@ -46,7 +51,7 @@ const Signup = () => {
       setAuthUser(data);
       navigate("/chat");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ErrorResponse>) => {
       console.error("Signup Error:", error);
       toast.error(error.response?.data?.message || "Signup failed. Try again!");
     },

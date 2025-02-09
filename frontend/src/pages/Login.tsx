@@ -10,6 +10,11 @@ import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import { AxiosError } from "axios";
+
+interface ErrorResponse {
+  message?: string;
+}
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -42,7 +47,7 @@ const Login = () => {
       setAuthUser(data);
       navigate("/chat");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ErrorResponse>) => {
       console.error("Signup Error:", error);
       toast.error(error.response?.data?.message || "Signup failed. Try again!");
     },

@@ -1,8 +1,17 @@
 import { axiosInstance } from "@/lib/axios";
 import { create } from "zustand";
 
+interface AuthUser {
+  _id: string;
+  email: string;
+  fullName: string;
+  profilePic: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface AuthState {
-  authUser: string | null;
+  authUser: AuthUser | null;
   isCheckingAuth: boolean;
   setAuthUser: (user: string | null) => void;
   setCheckingAuth: (isChecking: boolean) => void;

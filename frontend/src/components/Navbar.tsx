@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
-import { Sun, Moon, Menu, X } from "lucide-react";
-import { Link } from "react-router";
+import { Sun, Moon, Menu, X, User } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "@/lib/axios";
+import toast from "react-hot-toast";
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -10,9 +14,30 @@ interface HeaderProps {
 }
 
 const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const { authUser, setAuthUser } = useAuthStore();
+  
   const navItems = ["Home", "Features", "Pricing", "FAQs", "Contact"];
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await axiosInstance.get("/auth/logout");
+    },
+    onSuccess: () => {
+      toast.success("Logout successfully!");
+      setAuthUser(null);
+      navigate("/login", { replace: true });
+    },
+    onError: (error) => {
+      console.error("Logout failed:", error);
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate()
+  };
+
   return (
     <header className="fixed w-full bg-white dark:bg-gray-900 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -52,14 +77,37 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
               <Moon className="h-5 w-5" />
             )}
           </Button>
-          <Link to="login">
-            <Button variant="outline" className="hidden md:inline-flex">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="signup">
-            <Button className="hidden md:inline-flex">Get Started</Button>
-          </Link>
+
+          {/* If user is logged in, show profile */}
+          {authUser ? (
+            <div className="relative group">
+              <button className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1">
+                <User className="h-5 w-5" />
+                <span className="text-sm">{authUser.fullName}</span>
+              </button>
+
+              {/* Dropdown for logout */}
+              <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg hidden group-hover:block">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Link to="login">
+                <Button variant="outline" className="hidden md:inline-flex">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="signup">
+                <Button className="hidden md:inline-flex">Get Started</Button>
+              </Link>
+            </>
+          )}
 
           <Button
             variant="ghost"
@@ -93,15 +141,29 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
               {item}
             </a>
           ))}
+
+          {/* Mobile view authentication buttons */}
           <div className="px-4 py-2">
-            <Link to="login">
-              <Button variant="outline" className="w-full mb-2">
-                Sign In
+            {authUser ? (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleLogout}
+              >
+                Logout
               </Button>
-            </Link>
-            <Link to="signup">
-              <Button className="w-full">Get Started</Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="login">
+                  <Button variant="outline" className="w-full mb-2">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="signup">
+                  <Button className="w-full">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </motion.div>
       )}
