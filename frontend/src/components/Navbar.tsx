@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "@/lib/axios";
-import toast from "react-hot-toast";
+// import { useMutation } from "@tanstack/react-query";
+// import { axiosInstance } from "@/lib/axios";
+// import toast from "react-hot-toast";
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -16,26 +16,27 @@ interface HeaderProps {
 const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { authUser, setAuthUser } = useAuthStore();
+  const { authUser, logout } = useAuthStore();
   
   const navItems = ["Home", "Features", "Pricing", "FAQs", "Contact"];
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      await axiosInstance.get("/auth/logout");
-    },
-    onSuccess: () => {
-      toast.success("Logout successfully!");
-      setAuthUser(null);
-      navigate("/login", { replace: true });
-    },
-    onError: (error) => {
-      console.error("Logout failed:", error);
-    },
-  });
+  // const logoutMutation = useMutation({
+  //   mutationFn: async () => {
+  //     await axiosInstance.get("/auth/logout");
+  //   },
+  //   onSuccess: () => {
+  //     toast.success("Logout successfully!");
+  //     setAuthUser(null);
+  //     navigate("/login", { replace: true });
+  //   },
+  //   onError: (error) => {
+  //     console.error("Logout failed:", error);
+  //   },
+  // });
 
-  const handleLogout = () => {
-    logoutMutation.mutate()
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
   };
 
   return (

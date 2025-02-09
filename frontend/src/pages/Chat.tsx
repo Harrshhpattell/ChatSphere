@@ -1,9 +1,14 @@
-
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 const Chat = () => {
   return (
-    <div>Chat</div>
-  )
-}
+    <div>
+      <Link to="/">
+        <Button>Okay</Button>
+      </Link>
+    </div>
+  );
+};
 
-export default Chat
+export default Chat;
