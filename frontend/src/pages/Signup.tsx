@@ -1,19 +1,68 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, Lock, Mail, MessageSquare, User } from "lucide-react";
+import { useState } from "react";
+import {
+  CircleX,
+  Eye,
+  EyeOff,
+  Loader,
+  Lock,
+  Mail,
+  MessageSquare,
+  User,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "@/lib/axios";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useNavigate } from "react-router-dom";
+
+// Define Zod Schema
+const signupSchema = z.object({
+  fullName: z.string().min(3, "Full Name must be at least 3 characters"),
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+// Infer TypeScript types from Zod schema
+type SignupFormData = z.infer<typeof signupSchema>;
 
 const Signup = () => {
+  const navigate = useNavigate();
+
+  const { setAuthUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    fullName: "",
-    password: "",
+
+  const mutation = useMutation({
+    mutationFn: async (data: SignupFormData) => {
+      const res = await axiosInstance.post("/auth/signup", data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Account created successfully!");
+      setAuthUser(data);
+      navigate("/chat");
+    },
+    onError: (error: any) => {
+      console.error("Signup Error:", error);
+      toast.error(error.response?.data?.message || "Signup failed. Try again!");
+    },
+    retry: 1,
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("formdata", formData);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+  });
+
+  const onSubmit = (data: SignupFormData) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -34,7 +83,7 @@ const Signup = () => {
                 </div>
 
                 {/* Signup Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div className="space-y-4">
                     {/* Full Name Field */}
                     <div className="space-y-2">
@@ -45,10 +94,17 @@ const Signup = () => {
                           type="text"
                           className="pl-10 h-12"
                           placeholder="John Doe"
-                          value={formData.fullName}
-                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          {...register("fullName")}
                         />
                       </div>
+                      {errors.fullName && (
+                        <div className="bg-red-50 rounded p-2 flex gap-2 items-center">
+                          <CircleX className="text-red-500" />
+                          <p className="text-red-500 text-sm">
+                            {errors.fullName.message}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Email Field */}
@@ -60,10 +116,17 @@ const Signup = () => {
                           type="email"
                           className="pl-10 h-12"
                           placeholder="you@example.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          {...register("email")}
                         />
                       </div>
+                      {errors.email && (
+                        <div className="bg-red-50 rounded p-2 flex gap-2 items-center">
+                          <CircleX className="text-red-500" />
+                          <p className="text-red-500 text-sm">
+                            {errors.email.message}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Password Field */}
@@ -75,8 +138,7 @@ const Signup = () => {
                           type={showPassword ? "text" : "password"}
                           className="pl-10 pr-10 h-12"
                           placeholder="Min. 6 characters"
-                          value={formData.password}
-                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          {...register("password")}
                         />
                         <button
                           type="button"
@@ -93,20 +155,36 @@ const Signup = () => {
                       <p className="text-xs text-muted-foreground">
                         Must be at least 6 characters long
                       </p>
+                      {errors.password && (
+                        <div className="bg-red-50 rounded p-2 flex gap-2 items-center">
+                          <CircleX className="text-red-500" />
+                          <p className="text-red-500 text-sm">
+                            {errors.password.message}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full h-12 bg-primary text-primary-foreground rounded-lg font-medium
-                      hover:bg-primary/90 active:scale-[0.98] transition-all"
+                    disabled={mutation.isPending}
+                    className={`w-full h-12 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center ${
+                      mutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
-                    Create Account
+                    {mutation.isPending ? (
+                      <Loader className="size-6 animate-spin" />
+                    ) : (
+                      "Create Account"
+                    )}
                   </button>
                 </form>
 
                 <div className="text-center text-sm">
-                  <span className="text-muted-foreground">Already have an account? </span>
+                  <span className="text-muted-foreground">
+                    Already have an account?{" "}
+                  </span>
                   <a
                     href="/login"
                     className="text-primary hover:underline font-medium"
@@ -128,18 +206,19 @@ const Signup = () => {
                 Join <span className="text-primary">ChatSphere</span>
               </h1>
               <p className="text-muted-foreground text-lg max-w-md">
-                Connect with friends, share moments, and stay in touch with your loved ones in a secure environment
+                Connect with friends, share moments, and stay in touch with your
+                loved ones in a secure environment
               </p>
             </div>
-            
+
             {/* Decorative Elements */}
             <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
                   className={`aspect-square rounded-2xl bg-primary/10 
-                    ${i % 2 === 0 ? 'animate-pulse' : ''}
-                    ${i % 3 === 0 ? 'scale-90' : 'scale-100'}
+                    ${i % 2 === 0 ? "animate-pulse" : ""}
+                    ${i % 3 === 0 ? "scale-90" : "scale-100"}
                   `}
                 />
               ))}
@@ -149,15 +228,21 @@ const Signup = () => {
             <div className="space-y-4 text-left max-w-md mx-auto">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <p className="text-muted-foreground">End-to-end encrypted messaging</p>
+                <p className="text-muted-foreground">
+                  End-to-end encrypted messaging
+                </p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <p className="text-muted-foreground">Real-time message delivery</p>
+                <p className="text-muted-foreground">
+                  Real-time message delivery
+                </p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <p className="text-muted-foreground">Cross-platform synchronization</p>
+                <p className="text-muted-foreground">
+                  Cross-platform synchronization
+                </p>
               </div>
             </div>
           </div>

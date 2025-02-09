@@ -1,5 +1,5 @@
-import { axiosInstance } from '@/lib/axios';
-import { create } from 'zustand';
+import { axiosInstance } from "@/lib/axios";
+import { create } from "zustand";
 
 interface AuthState {
   authUser: string | null;
@@ -17,7 +17,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-console.log("res", res)
+      console.log("res", res);
       set({ authUser: res.data });
     } catch (error) {
       console.log("Error in checkAuth:", error);

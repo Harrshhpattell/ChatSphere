@@ -22,6 +22,7 @@ A real-time chat application built using the MERN stack (MongoDB, Express.js, Re
 - Axios    
 - Zustand    
 - Zod ( Zod is a TypeScript-first schema declaration and validation library. )
+- React-hook-form
 - React Query.
 
 ---
