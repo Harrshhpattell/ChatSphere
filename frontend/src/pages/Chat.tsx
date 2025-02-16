@@ -5,7 +5,7 @@ const Chat = () => {
   return (
     <div>
       <Link to="/">
-        <Button>Okay</Button>
+        <Button>Okayyyy</Button>
       </Link>
     </div>
   );
