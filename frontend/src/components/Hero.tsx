@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import ChatImage from "@/assets/Landing_page.png"
 
 const Hero = () => {
   return (
@@ -37,7 +38,12 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg shadow-lg transform rotate-3"></div>
               <div className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg -rotate-3">
                 {/* Placeholder for 3D Chat UI Mockup */}
-                <div className="h-full flex items-center justify-center text-2xl font-bold">3D Chat UI Mockup</div>
+                <img 
+                alt="Chat"
+                src={ChatImage}
+                className="object-contain rounded"
+                />
+                {/* <div className="h-full flex items-center justify-center text-2xl font-bold">3D Chat UI Mockup</div> */}
               </div>
             </div>
           </motion.div>
