@@ -20,7 +20,7 @@ A real-time chat application built using the MERN stack (MongoDB, Express.js, Re
 - Tailwindcss  
 - Shadecn UI
 - Axios    
-- Zustand    
+- Redux Toolkit  
 - Zod ( Zod is a TypeScript-first schema declaration and validation library. )
 - React-hook-form
 - React Query.

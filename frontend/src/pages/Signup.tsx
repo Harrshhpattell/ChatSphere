@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/store/useAuthStore";
+// import { useAuthStore } from "@/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 
@@ -38,7 +38,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 const Signup = () => {
   const navigate = useNavigate();
 
-  const { setAuthUser } = useAuthStore();
+  // const { setAuthUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
 
   const mutation = useMutation({
@@ -48,7 +48,7 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       toast.success("Account created successfully!");
-      setAuthUser(data);
+      // setAuthUser(data);
       navigate("/chat");
     },
     onError: (error: AxiosError<ErrorResponse>) => {

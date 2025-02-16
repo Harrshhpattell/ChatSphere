@@ -1,12 +1,23 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
+import { Loader } from "lucide-react";
+import { useAppSelector } from "@/hooks/redux";
 
 const ProtectedLayout = () => {
-  const { authUser, isCheckingAuth } = useAuthStore();
+  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
-  if (isCheckingAuth) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-10 animate-spin" />
+      </div>
+    );
+  }
 
-  return authUser ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedLayout;

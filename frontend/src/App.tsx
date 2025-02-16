@@ -5,24 +5,17 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthLayout from "./layout/AuthLayout";
 import { useEffect } from "react";
-import { useAuthStore } from "@/store/useAuthStore";
-import { Loader } from "lucide-react";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Chat from "./pages/Chat";
+import { checkAuth } from "./features/auth/authSlice";
+import { useAppDispatch } from "./hooks/redux";
 
 function App() {
-  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
-
+  const dispatch = useAppDispatch();
+  
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  if (isCheckingAuth && !authUser)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader className="size-10 animate-spin" />
-      </div>
-    );
+    dispatch(checkAuth());
+  }, [dispatch]);
     
   return (
     <>

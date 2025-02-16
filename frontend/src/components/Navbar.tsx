@@ -3,7 +3,10 @@ import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { logout } from "@/features/auth/authSlice";
+import toast from "react-hot-toast";
+// import { useAuthStore } from "@/store/useAuthStore";
 // import { useMutation } from "@tanstack/react-query";
 // import { axiosInstance } from "@/lib/axios";
 // import toast from "react-hot-toast";
@@ -15,9 +18,11 @@ interface HeaderProps {
 
 const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { authUser, logout } = useAuthStore();
-  
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  console.log("user", user)
+  console.log("isAuthenticated", isAuthenticated)
   const navItems = ["Home", "Features", "Pricing", "FAQs", "Contact"];
 
   // const logoutMutation = useMutation({
@@ -35,8 +40,14 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
   // });
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    try {
+      await dispatch(logout()).unwrap();
+      toast.success("Logout successfully!");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed. Please try again.");
+    }
   };
 
   return (
@@ -80,11 +91,11 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
           </Button>
 
           {/* If user is logged in, show profile */}
-          {authUser ? (
+          {isAuthenticated && user ? (
             <div className="relative group">
               <button className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1">
                 <User className="h-5 w-5" />
-                <span className="text-sm">{authUser.fullName}</span>
+                <span className="text-sm">{user.fullName}</span>
               </button>
 
               {/* Dropdown for logout */}
@@ -99,17 +110,16 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
             </div>
           ) : (
             <>
-              <Link to="login">
+              <Link to="/login">
                 <Button variant="outline" className="hidden md:inline-flex">
                   Sign In
                 </Button>
               </Link>
-              <Link to="signup">
+              <Link to="/signup">
                 <Button className="hidden md:inline-flex">Get Started</Button>
               </Link>
             </>
           )}
-
           <Button
             variant="ghost"
             size="icon"
@@ -145,7 +155,7 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
 
           {/* Mobile view authentication buttons */}
           <div className="px-4 py-2">
-            {authUser ? (
+          {isAuthenticated && user ? (
               <Button
                 variant="outline"
                 className="w-full"
@@ -155,12 +165,12 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
               </Button>
             ) : (
               <>
-                <Link to="login">
+                <Link to="/login">
                   <Button variant="outline" className="w-full mb-2">
                     Sign In
                   </Button>
                 </Link>
-                <Link to="signup">
+                <Link to="/signup">
                   <Button className="w-full">Get Started</Button>
                 </Link>
               </>

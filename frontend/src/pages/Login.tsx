@@ -9,8 +9,9 @@ import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
 import { AxiosError } from "axios";
+import { setCredentials } from "@/features/auth/authSlice";
+import { useAppDispatch } from "@/hooks/redux";
 
 interface ErrorResponse {
   message?: string;
@@ -26,7 +27,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setAuthUser } = useAuthStore();
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -44,8 +45,9 @@ const Login = () => {
     },
     onSuccess: (data) => {
       toast.success("Login successfully!");
-      setAuthUser(data);
-      navigate("/chat");
+      console.log(data)
+      dispatch(setCredentials(data));
+      navigate('/chat');
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       console.error("Signup Error:", error);
