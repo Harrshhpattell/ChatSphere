@@ -20,6 +20,8 @@ import toast from "react-hot-toast";
 // import { useAuthStore } from "@/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import { useAppDispatch } from "@/hooks/redux";
+import { setCredentials } from "@/features/auth/authSlice";
 
 interface ErrorResponse {
   message?: string;
@@ -36,7 +38,8 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 const Signup = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
   // const { setAuthUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,8 +51,8 @@ const Signup = () => {
     },
     onSuccess: (data) => {
       toast.success("Account created successfully!");
-      // setAuthUser(data);
-      navigate("/chat");
+      dispatch(setCredentials(data));
+      navigate('/chat');
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       console.error("Signup Error:", error);

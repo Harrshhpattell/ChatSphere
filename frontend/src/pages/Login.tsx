@@ -45,7 +45,6 @@ const Login = () => {
     },
     onSuccess: (data) => {
       toast.success("Login successfully!");
-      console.log(data)
       dispatch(setCredentials(data));
       navigate('/chat');
     },
