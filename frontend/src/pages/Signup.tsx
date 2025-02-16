@@ -175,10 +175,8 @@ const Signup = () => {
                   </div>
 
                   <button
-                    // type="submit"
-                    // disabled={mutation.isPending}
-                    type="button" // Use "button" to prevent form submission
-                    onClick={() => toast.error('Sign-up is temporarily disabled. Stay tuned!')}
+                    type="submit"
+                    disabled={mutation.isPending}
                     className={`w-full h-12 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center ${
                       mutation.isPending ? "opacity-50 cursor-not-allowed" : ""
                     }`}

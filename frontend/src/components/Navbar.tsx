@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
-import { Sun, Moon, Menu, X, User } from "lucide-react";
+import { Sun, Moon, Menu, X, User, ChevronUp, ChevronDown, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { logout } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 // import { useAuthStore } from "@/store/useAuthStore";
 // import { useMutation } from "@tanstack/react-query";
 // import { axiosInstance } from "@/lib/axios";
@@ -21,8 +27,8 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
   const dispatch = useAppDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  console.log("user", user)
-  console.log("isAuthenticated", isAuthenticated)
+  console.log("user", user);
+  console.log("isAuthenticated", isAuthenticated);
   const navItems = ["Home", "Features", "Pricing", "FAQs", "Contact"];
 
   // const logoutMutation = useMutation({
@@ -92,22 +98,43 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
 
           {/* If user is logged in, show profile */}
           {isAuthenticated && user ? (
-            <div className="relative group">
-              <button className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1">
-                <User className="h-5 w-5" />
-                <span className="text-sm">{user.fullName}</span>
-              </button>
+            // <div className="relative group">
+            //   <button className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1">
+            //     <User className="h-5 w-5" />
+            //     <span className="text-sm">{user.fullName}</span>
+            //   </button>
 
-              {/* Dropdown for logout */}
-              <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg hidden group-hover:block">
-                <button
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
+            //   {/* Dropdown for logout */}
+            //   <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg hidden group-hover:block">
+            //     <button
+            //       className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+            //       onClick={handleLogout}
+            //     >
+            //       Logout
+            //     </button>
+            //   </div>
+            // </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <span className="text-sm">{user.fullName}</span>
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                {/* <DropdownMenuItem>
+                  <span>Account</span>
+                </DropdownMenuItem> */}
+                <DropdownMenuItem onClick={handleLogout}>
+                <LogOut />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <Link to="/login">
@@ -155,7 +182,7 @@ const Navbar = ({ isDarkMode, toggleTheme }: HeaderProps) => {
 
           {/* Mobile view authentication buttons */}
           <div className="px-4 py-2">
-          {isAuthenticated && user ? (
+            {isAuthenticated && user ? (
               <Button
                 variant="outline"
                 className="w-full"

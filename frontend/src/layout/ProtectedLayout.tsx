@@ -1,6 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { Loader } from "lucide-react";
 import { useAppSelector } from "@/hooks/redux";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "./components/app-sidebar";
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
@@ -17,7 +19,15 @@ const ProtectedLayout = () => {
     return <Navigate to="/login" />;
   }
 
-  return <Outlet />;
+  return (
+    <SidebarProvider>
+    <AppSidebar />
+    <main>
+      <SidebarTrigger />
+      <Outlet />
+    </main>
+  </SidebarProvider>
+  )
 };
 
 export default ProtectedLayout;
