@@ -1,8 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { Loader } from "lucide-react";
+import { HelpCircle, Loader, MessageSquare, Settings, Users } from "lucide-react";
 import { useAppSelector } from "@/hooks/redux";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "./components/app-sidebar";
+import { Sidebar, SidebarItem } from "./components/app-sidebar";
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
@@ -20,13 +19,17 @@ const ProtectedLayout = () => {
   }
 
   return (
-    <SidebarProvider>
-    <AppSidebar />
+    <div className="flex">
+    <Sidebar>
+        <SidebarItem icon={<MessageSquare size={20} />} text="Messages" active={true} alert={true} expanded={undefined} />
+        <SidebarItem icon={<Users size={20} />} text="Contacts" active={false} alert={false} expanded={undefined} />
+        <SidebarItem icon={<Settings size={20} />} text="Settings" active={false} alert={false} expanded={undefined} />
+        <SidebarItem icon={<HelpCircle size={20} />} text="Help" active={false} alert={false} expanded={undefined} />
+      </Sidebar>
     <main>
-      <SidebarTrigger />
       <Outlet />
     </main>
-  </SidebarProvider>
+  </div>
   )
 };
 

@@ -1,111 +1,127 @@
-import { Bell, ChevronUp, Home, MessageCircle, Settings } from "lucide-react";
+import React, { useState, ReactNode } from "react";
+import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Chat",
-    url: "#",
-    icon: MessageCircle,
-  },
-  {
-    title: "Notification",
-    url: "#",
-    icon: Bell,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
-
-export function AppSidebar() {
-  return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="flex items-center gap-2 px-4 py-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-white">
-          <span className="text-xs font-bold">APP</span>
-        </div>
-        <span className="group-data-[collapsible=icon]:hidden">ChatSphere</span>
-      </SidebarHeader>
-      {/* ----------------------------main ------------------------ */}
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      {/* --------------------footer--------------------- */}
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src="/api/placeholder/32/32" alt="User" />
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm">Username</span>
-                  <ChevronUp className="ml-auto h-4 w-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
-  );
+// Define prop types for SidebarItem
+interface SidebarItemProps {
+  icon: ReactNode;
+  text: string;
+  active?: boolean;
+  alert?: boolean;
+  expanded?: boolean;
 }
+
+// SidebarItem component that receives expanded as a prop
+const SidebarItem: React.FC<SidebarItemProps> = ({ 
+  icon, 
+  text, 
+  active = false, 
+  alert = false, 
+  expanded 
+}) => {
+  return (
+    <li
+      className={`relative flex items-center py-2 px-3 my-1
+        font-medium rounded-md cursor-pointer
+        transition-colors group
+        ${
+          active
+            ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
+            : "hover:bg-indigo-50 text-gray-600"
+        }
+    `}
+    >
+      {icon}
+      <span
+        className={`overflow-hidden transition-all ${
+          expanded ? "w-52 ml-3" : "w-0"
+        }`}
+      >
+        {text}
+      </span>
+      {alert && (
+        <div
+          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+            expanded ? "" : "top-2"
+          }`}
+        />
+      )}
+
+      {!expanded && (
+        <div
+          className={`
+          absolute left-full rounded-md px-2 py-1 ml-6
+          bg-indigo-100 text-indigo-800 text-sm
+          invisible opacity-20 -translate-x-3 transition-all
+          group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
+      `}
+        >
+          {text}
+        </div>
+      )}
+    </li>
+  );
+};
+
+// Define prop types for Sidebar
+interface SidebarProps {
+  children: ReactNode;
+}
+
+// Sidebar component that manages its own expanded state
+const Sidebar: React.FC<SidebarProps> = ({ children }) => {
+  const [expanded, setExpanded] = useState<boolean>(true);
+  
+  // Clone children and pass expanded prop to them
+  const childrenWithProps = React.Children.map(children, (child) => {
+    if (React.isValidElement<Partial<SidebarItemProps>>(child)) {
+      return React.cloneElement(child, { expanded });
+    }
+    return child;
+  });
+  
+  return (
+    <aside className="h-screen">
+      <nav className="h-full flex flex-col bg-white border-r shadow-sm">
+        <div className="p-4 pb-2 flex justify-between items-center">
+          <img
+            src="https://img.logoipsum.com/243.svg"
+            className={`overflow-hidden transition-all ${
+              expanded ? "w-32" : "w-0"
+            }`}
+            alt="Logo"
+          />
+          <button
+            onClick={() => setExpanded((curr) => !curr)}
+            className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+          >
+            {expanded ? <ChevronFirst /> : <ChevronLast />}
+          </button>
+        </div>
+
+        <ul className="flex-1 px-3">{childrenWithProps}</ul>
+
+        <div className="border-t flex p-3">
+          <img
+            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+            alt="User avatar"
+            className="w-10 h-10 rounded-md"
+          />
+          <div
+            className={`
+              flex justify-between items-center
+              overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
+          `}
+          >
+            <div className="leading-4">
+              <h4 className="font-semibold">John Doe</h4>
+              <span className="text-xs text-gray-600">johndoe@gmail.com</span>
+            </div>
+            <MoreVertical size={20} />
+          </div>
+        </div>
+      </nav>
+    </aside>
+  );
+};
+
+export { Sidebar, SidebarItem };

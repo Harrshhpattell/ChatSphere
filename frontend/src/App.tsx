@@ -36,7 +36,7 @@ function App() {
           {/* Toggle Button */}
           <button
             onClick={() => setIsHeaderOpen(!isHeaderOpen)}
-            className="absolute left-0 top-20 z-10 h-14 w-8 flex items-center justify-center bg-yellow-600 text-white"
+            className="absolute left-0 top-20 z-10 h-5 w-3 flex items-center justify-center bg-yellow-600 text-white"
             aria-label={isHeaderOpen ? "Collapse header" : "Expand header"}
           >
             <span className="transform transition-transform duration-300">
