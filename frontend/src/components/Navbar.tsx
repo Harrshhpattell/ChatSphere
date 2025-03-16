@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
-import { Sun, Moon, Menu, X, User, ChevronUp, ChevronDown, LogOut } from "lucide-react";
+import { Sun, Moon, Menu, X, User, ChevronDown, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { logout } from "@/features/auth/authSlice";
