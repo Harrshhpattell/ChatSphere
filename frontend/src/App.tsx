@@ -9,6 +9,7 @@ import ProtectedLayout from "./layout/ProtectedLayout";
 import Chat from "./pages/Chat";
 import { checkAuth } from "./features/auth/authSlice";
 import { useAppDispatch } from "./hooks/redux";
+import Settings from "./pages/Settings";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -54,6 +55,7 @@ function App() {
             {/* Protected Routes (For authenticated users) */}
             <Route element={<ProtectedLayout />}>
               <Route path="/chat" element={<Chat />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/dashboard" element={<Home />} />
             </Route>
           </Routes>

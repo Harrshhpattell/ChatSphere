@@ -17,16 +17,16 @@ const ProtectedLayout = () => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-
+console.log("windows", window.location.pathname)
   return (
     <div className="flex">
     <Sidebar>
-        <SidebarItem icon={<MessageSquare size={20} />} text="Messages" active={true} alert={true} expanded={undefined} />
+        <SidebarItem icon={<MessageSquare size={20} />} text="Messages" active={false} alert={true} expanded={undefined} />
         <SidebarItem icon={<Users size={20} />} text="Contacts" active={false} alert={false} expanded={undefined} />
-        <SidebarItem icon={<Settings size={20} />} text="Settings" active={false} alert={false} expanded={undefined} />
+        <SidebarItem icon={<Settings size={20} />} text="Settings"  active={window.location.pathname === "/settings"}  alert={false} expanded={undefined}  to="/settings" />
         <SidebarItem icon={<HelpCircle size={20} />} text="Help" active={false} alert={false} expanded={undefined} />
       </Sidebar>
-    <main>
+    <main className="flex-1">
       <Outlet />
     </main>
   </div>

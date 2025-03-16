@@ -1,5 +1,11 @@
 import React, { useState, ReactNode } from "react";
-import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react";
+import {
+  MoreVertical,
+  ChevronLast,
+  ChevronFirst,
+  MessageSquare,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Define prop types for SidebarItem
 interface SidebarItemProps {
@@ -8,16 +14,26 @@ interface SidebarItemProps {
   active?: boolean;
   alert?: boolean;
   expanded?: boolean;
+  to?: string;
 }
 
 // SidebarItem component that receives expanded as a prop
-const SidebarItem: React.FC<SidebarItemProps> = ({ 
-  icon, 
-  text, 
-  active = false, 
-  alert = false, 
-  expanded 
+const SidebarItem: React.FC<SidebarItemProps> = ({
+  icon,
+  text,
+  active = false,
+  alert = false,
+  expanded,
+  to,
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (to) {
+      navigate(to);
+    }
+  };
+
   return (
     <li
       className={`
@@ -30,6 +46,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
             : "hover:bg-indigo-50 text-gray-600"
         }
     `}
+    onClick={handleClick}
     >
       {icon}
       <span
@@ -71,7 +88,7 @@ interface SidebarProps {
 // Sidebar component that manages its own expanded state
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const [expanded, setExpanded] = useState<boolean>(true);
-  
+
   // Clone children and pass expanded prop to them
   const childrenWithProps = React.Children.map(children, (child) => {
     if (React.isValidElement<Partial<SidebarItemProps>>(child)) {
@@ -79,18 +96,21 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     }
     return child;
   });
-  
+
   return (
     <aside className="h-screen">
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
-          <img
-            src="https://img.logoipsum.com/243.svg"
-            className={`overflow-hidden transition-all ${
+          <span
+            className={`flex items-center gap-2 text-primary font-medium overflow-hidden transition-all ${
               expanded ? "w-32" : "w-0"
             }`}
-            alt="Logo"
-          />
+          >
+            <div className="inline-flex p-2 rounded-lg bg-primary/10 group">
+              <MessageSquare className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
+            </div>{" "}
+            ChatSphere
+          </span>
           <button
             onClick={() => setExpanded((curr) => !curr)}
             className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
@@ -126,5 +146,3 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 };
 
 export { Sidebar, SidebarItem };
-
-
