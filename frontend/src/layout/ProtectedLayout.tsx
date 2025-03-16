@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { HelpCircle, Loader, MessageSquare, Settings, Users } from "lucide-react";
 import { useAppSelector } from "@/hooks/redux";
-import { Sidebar, SidebarItem } from "./components/app-sidebar";
+import { Sidebar, SidebarItem } from "./components/sidebar";
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
