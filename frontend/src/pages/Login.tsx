@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { setCredentials } from "@/features/auth/authSlice";
 import { useAppDispatch } from "@/hooks/redux";

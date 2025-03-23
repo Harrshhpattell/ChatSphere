@@ -1,10 +1,12 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router";
 import { HelpCircle, Loader, MessageSquare, Settings, Users } from "lucide-react";
 import { useAppSelector } from "@/hooks/redux";
 import { Sidebar, SidebarItem } from "./components/sidebar";
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   if (loading) {
     return (
@@ -17,13 +19,13 @@ const ProtectedLayout = () => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-console.log("windows", window.location.pathname)
+
   return (
     <div className="flex">
     <Sidebar>
-        <SidebarItem icon={<MessageSquare size={20} />} text="Messages" active={false} alert={true} expanded={undefined} />
+        <SidebarItem icon={<MessageSquare size={20} />} text="Messages" active={currentPath === "/chat"}  alert={false} expanded={undefined}  to="/chat" />
         <SidebarItem icon={<Users size={20} />} text="Contacts" active={false} alert={false} expanded={undefined} />
-        <SidebarItem icon={<Settings size={20} />} text="Settings"  active={window.location.pathname === "/settings"}  alert={false} expanded={undefined}  to="/settings" />
+        <SidebarItem icon={<Settings size={20} />} text="Settings"  active={currentPath === "/settings"}  alert={false} expanded={undefined}  to="/settings" />
         <SidebarItem icon={<HelpCircle size={20} />} text="Help" active={false} alert={false} expanded={undefined} />
       </Sidebar>
     <main className="flex-1">

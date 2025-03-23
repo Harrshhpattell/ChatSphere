@@ -18,7 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 // import { useAuthStore } from "@/store/useAuthStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "@/hooks/redux";
 import { setCredentials } from "@/features/auth/authSlice";

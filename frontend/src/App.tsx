@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthLayout from "./layout/AuthLayout";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Chat from "./pages/Chat";
 import { checkAuth } from "./features/auth/authSlice";
@@ -13,7 +13,7 @@ import Settings from "./pages/Settings";
 
 function App() {
   const dispatch = useAppDispatch();
-  const [isHeaderOpen, setIsHeaderOpen] = useState<boolean>(true);
+  // const [isHeaderOpen, setIsHeaderOpen] = useState<boolean>(true);
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -24,7 +24,7 @@ function App() {
       <BrowserRouter>
         <div className="relative">
           {/* Collapsible Header */}
-          <header
+          {/* <header
             className={`bg-yellow-500 text-white overflow-hidden transition-all duration-300 ease-in-out ${
               isHeaderOpen ? "h-14" : "h-0"
             }`}
@@ -32,10 +32,10 @@ function App() {
             <div className="text-center p-4">
               🚧 This application is currently under development. 🚧
             </div>
-          </header>
+          </header> */}
 
           {/* Toggle Button */}
-          <button
+          {/* <button
             onClick={() => setIsHeaderOpen(!isHeaderOpen)}
             className="absolute left-0 top-20 z-10 h-5 w-3 flex items-center justify-center bg-yellow-600 text-white"
             aria-label={isHeaderOpen ? "Collapse header" : "Expand header"}
@@ -43,7 +43,7 @@ function App() {
             <span className="transform transition-transform duration-300">
               {isHeaderOpen ? "❯" : "❮"}
             </span>
-          </button>
+          </button> */}
           <Routes>
             <Route index element={<Home />} />
 

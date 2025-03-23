@@ -5,7 +5,8 @@ import {
   ChevronFirst,
   MessageSquare,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
+import { useAppSelector } from "@/hooks/redux";
 
 // Define prop types for SidebarItem
 interface SidebarItemProps {
@@ -46,7 +47,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
             : "hover:bg-indigo-50 text-gray-600"
         }
     `}
-    onClick={handleClick}
+      onClick={handleClick}
     >
       {icon}
       <span
@@ -88,6 +89,7 @@ interface SidebarProps {
 // Sidebar component that manages its own expanded state
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   const [expanded, setExpanded] = useState<boolean>(true);
+  const { user } = useAppSelector((state) => state.auth);
 
   // Clone children and pass expanded prop to them
   const childrenWithProps = React.Children.map(children, (child) => {
@@ -123,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
         <div className="border-t flex p-3">
           <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+            src={user?.profilePic}
             alt="User avatar"
             className="w-10 h-10 rounded-md"
           />
@@ -134,8 +136,8 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
           `}
           >
             <div className="leading-4">
-              <h4 className="font-semibold">John Doe</h4>
-              <span className="text-xs text-gray-600">johndoe@gmail.com</span>
+              <h4 className="font-semibold">{user?.fullName}</h4>
+              <span className="text-xs text-gray-600">{user?.email}</span>
             </div>
             <MoreVertical size={20} />
           </div>
