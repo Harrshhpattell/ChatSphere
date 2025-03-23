@@ -7,7 +7,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useAppSelector } from "@/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import {
   DropdownMenu,
@@ -15,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/features/auth/authSlice";
+import toast from "react-hot-toast";
 
 // Define prop types for SidebarItem
 interface SidebarItemProps {
@@ -96,6 +98,8 @@ interface SidebarProps {
 
 // Sidebar component that manages its own expanded state
 const Sidebar: React.FC<SidebarProps> = ({ children }) => {
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState<boolean>(true);
   const { user } = useAppSelector((state) => state.auth);
 
@@ -106,6 +110,17 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
     }
     return child;
   });
+
+   const handleLogout = async () => {
+      try {
+        await dispatch(logout()).unwrap();
+        toast.success("Logout successfully!");
+        navigate("/login", { replace: true });
+      } catch (error) {
+        console.error("Logout failed:", error);
+        toast.error("Logout failed. Please try again.");
+      }
+    };
 
   return (
     <aside className="h-screen">
@@ -156,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
               </div>
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="w-56" onClick={handleLogout}>
             <DropdownMenuItem>
               <LogOut size={20} /> Log out
             </DropdownMenuItem>
