@@ -4,9 +4,17 @@ import {
   ChevronLast,
   ChevronFirst,
   MessageSquare,
+  LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAppSelector } from "@/hooks/redux";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Define prop types for SidebarItem
 interface SidebarItemProps {
@@ -123,25 +131,37 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
         <ul className="flex-1 px-3">{childrenWithProps}</ul>
 
-        <div className="border-t flex p-3">
-          <img
-            src={user?.profilePic}
-            alt="User avatar"
-            className="w-10 h-10 rounded-md"
-          />
-          <div
-            className={`
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="border-t flex p-3">
+              <Avatar className="h-10- w-10 rounded-md border-4 border-background">
+                <AvatarImage src={user?.profilePic} alt="Profile" />
+                <AvatarFallback className="text-4xl">
+                  {user?.fullName
+                    ? user.fullName.substring(0, 2).toUpperCase()
+                    : "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div
+                className={`
               flex justify-between items-center
               overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
           `}
-          >
-            <div className="leading-4">
-              <h4 className="font-semibold">{user?.fullName}</h4>
-              <span className="text-xs text-gray-600">{user?.email}</span>
+              >
+                <div className="leading-4">
+                  <h4 className="font-semibold">{user?.fullName}</h4>
+                  <span className="text-xs text-gray-600">{user?.email}</span>
+                </div>
+                <MoreVertical size={20} />
+              </div>
             </div>
-            <MoreVertical size={20} />
-          </div>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem>
+              <LogOut size={20} /> Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </aside>
   );
