@@ -30,6 +30,7 @@ interface ErrorResponse {
 // Define Zod Schema
 const signupSchema = z.object({
   fullName: z.string().min(3, "Full Name must be at least 3 characters"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
@@ -77,7 +78,7 @@ const Signup = () => {
     <div className="min-h-screen bg-gradient-to-bl from-primary/5 via-background to-primary/10">
       <div className="container mx-auto min-h-screen grid lg:grid-cols-2 gap-8 items-center px-4">
         {/* Left Side - Sign Up Form */}
-        <div className="w-full max-w-md mx-auto order-2 lg:order-1">
+        <div className="w-full max-w-md mx-auto order-2 lg:order-1 my-10">
           <Card className="backdrop-blur-sm bg-card/50">
             <CardContent className="p-6">
               <div className="space-y-8">
@@ -110,6 +111,28 @@ const Signup = () => {
                           <CircleX className="text-red-500" />
                           <p className="text-red-500 text-sm">
                             {errors.fullName.message}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* UserName Field */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Username</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Input
+                          type="text"
+                          className="pl-10 h-12"
+                          placeholder="John_Doe"
+                          {...register("username")}
+                        />
+                      </div>
+                      {errors.username && (
+                        <div className="bg-red-50 rounded p-2 flex gap-2 items-center">
+                          <CircleX className="text-red-500" />
+                          <p className="text-red-500 text-sm">
+                            {errors.username.message}
                           </p>
                         </div>
                       )}
