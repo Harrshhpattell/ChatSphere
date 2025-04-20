@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Check,
   CircleX,
   Eye,
   EyeOff,
@@ -27,6 +28,12 @@ interface ErrorResponse {
   message?: string;
 }
 
+interface UsernameStatus {
+  isChecking: boolean;
+  isAvailable: boolean | null;
+  message: string;
+}
+
 // Define Zod Schema
 const signupSchema = z.object({
   fullName: z.string().min(3, "Full Name must be at least 3 characters"),
@@ -35,25 +42,96 @@ const signupSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+// debounce hook
+const useDebounce = <T,>(value: T, delay: number): T => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 // Infer TypeScript types from Zod schema
 type SignupFormData = z.infer<typeof signupSchema>;
 
 const Signup = () => {
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   // const { setAuthUser } = useAuthStore();
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>({
+    isChecking: false,
+    isAvailable: null,
+    message: "",
+  });
+
+  const debouncedUsername = useDebounce(username, 1000);
+
+  useEffect(() => {
+    const checkUsernameAvailability = async (): Promise<void> => {
+      // Don't check if username is too short
+      if (!debouncedUsername || debouncedUsername.length < 3) {
+        setUsernameStatus({
+          isChecking: false,
+          isAvailable: null,
+          message: "",
+        });
+        return;
+      }
+
+      setUsernameStatus((prev) => ({ ...prev, isChecking: true }));
+
+      try {
+        await axiosInstance.post<{ message: string; available: boolean }>(
+          "/auth/check-username",
+          {
+            username: debouncedUsername,
+          }
+        );
+        setUsernameStatus({
+          isChecking: false,
+          isAvailable: true,
+          message: "Username is available",
+        });
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        setUsernameStatus({
+          isChecking: false,
+          isAvailable: false,
+          message:
+            axiosError.response?.data?.message || "Error checking username",
+        });
+      }
+    };
+
+    if (debouncedUsername) {
+      checkUsernameAvailability();
+    }
+  }, [debouncedUsername]);
 
   const mutation = useMutation({
     mutationFn: async (data: SignupFormData) => {
+      // Only proceed if username is available
+      if (username.length >= 3 && !usernameStatus.isAvailable) {
+        throw new Error("Please choose a different username");
+      }
       const res = await axiosInstance.post("/auth/signup", data);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success("Account created successfully!");
       dispatch(setCredentials(data));
-      navigate('/chat');
+      navigate("/chat");
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       console.error("Signup Error:", error);
@@ -74,9 +152,14 @@ const Signup = () => {
     mutation.mutate(data);
   };
 
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-bl from-primary/5 via-background to-primary/10">
-      <div className="container mx-auto min-h-screen grid lg:grid-cols-2 gap-8 items-center px-4">
+      <div className="container mx-auto min-h-screen grid lg:grid-cols-2 gap-8 items-start px-4">
         {/* Left Side - Sign Up Form */}
         <div className="w-full max-w-md mx-auto order-2 lg:order-1 my-10">
           <Card className="backdrop-blur-sm bg-card/50">
@@ -120,13 +203,30 @@ const Signup = () => {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Username</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                          @
+                        </span>
                         <Input
                           type="text"
                           className="pl-10 h-12"
                           placeholder="John_Doe"
                           {...register("username")}
+                          onChange={(e) => {
+                            register("username").onChange(e);
+                            handleUsernameChange(e);
+                          }}
                         />
+                        {username.length >= 3 && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {usernameStatus.isChecking ? (
+                              <Loader className="w-5 h-5 animate-spin text-muted-foreground" />
+                            ) : usernameStatus.isAvailable ? (
+                              <Check className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <CircleX className="w-5 h-5 text-red-500" />
+                            )}
+                          </div>
+                        )}
                       </div>
                       {errors.username && (
                         <div className="bg-red-50 rounded p-2 flex gap-2 items-center">
@@ -136,6 +236,32 @@ const Signup = () => {
                           </p>
                         </div>
                       )}
+                      {username.length >= 3 &&
+                        usernameStatus.message &&
+                        !errors.username && (
+                          <div
+                            className={`rounded p-2 flex gap-2 items-center ${
+                              usernameStatus.isAvailable
+                                ? "bg-green-50"
+                                : "bg-red-50"
+                            }`}
+                          >
+                            {usernameStatus.isAvailable ? (
+                              <Check className="text-green-500" />
+                            ) : (
+                              <CircleX className="text-red-500" />
+                            )}
+                            <p
+                              className={`text-sm ${
+                                usernameStatus.isAvailable
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {usernameStatus.message}
+                            </p>
+                          </div>
+                        )}
                     </div>
 
                     {/* Email Field */}
@@ -199,9 +325,11 @@ const Signup = () => {
 
                   <button
                     type="submit"
-                    disabled={mutation.isPending}
+                    disabled={mutation.isPending || 
+                      (username.length >= 3 && usernameStatus.isAvailable === false)}
                     className={`w-full h-12 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center ${
-                      mutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+                      mutation.isPending || 
+                      (username.length >= 3 && usernameStatus.isAvailable === false) ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
                     {mutation.isPending ? (
@@ -229,7 +357,7 @@ const Signup = () => {
         </div>
 
         {/* Right Side - Welcome Content */}
-        <div className="hidden lg:flex flex-col items-center justify-center relative order-1 lg:order-2">
+        <div className="hidden lg:flex flex-col items-center justify-center relative order-1 lg:order-2 py-10">
           <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-3xl"></div>
           <div className="relative space-y-8 text-center">
             <div className="space-y-2">

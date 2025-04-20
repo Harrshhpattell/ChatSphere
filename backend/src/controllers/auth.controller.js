@@ -53,6 +53,46 @@ export const signup = async (req, res) => {
   }
 };
 
+export const checkUniqueUserName = async (req, res) => {
+  const { username } = req.body;
+  try {
+    // Validate input
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+    
+    // Minimum length check
+    if (username.length < 3) {
+      return res.status(400).json({ message: "Username must be at least 3 characters" });
+    }
+    
+    // Check for valid characters
+    const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!validUsernameRegex.test(username)) {
+      return res.status(400).json({ 
+        message: "Username can only contain letters, numbers, and underscores" 
+      });
+    }
+    
+    // Check if username exists in database
+    const user = await User.findOne({ username: username.toLowerCase() });
+    
+    if (user) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+    
+    // If all checks pass, username is available
+    return res.status(200).json({ 
+      message: "Username is available",
+      available: true 
+    });
+    
+  } catch (error) {
+    console.log("Error in checking username:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
